@@ -27,6 +27,12 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: python tests/generate_tests.py
 
+      - name: Start Flask app
+        run: |
+          nohup python app.py > flask.log 2>&1 &
+          sleep 5
+          echo "✅ Flask server started on port 5000"
+
       - name: Run functional tests
         run: pytest -q || true
 
