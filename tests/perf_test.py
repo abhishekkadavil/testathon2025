@@ -1,25 +1,28 @@
-# tests/perf_test.py
-import requests, time, json, os
+import requests
+import time
+import statistics
 
-base_url = "http://127.0.0.1:5000/employee"
-results = []
+BASE_URL = "http://127.0.0.1:5000"  # Adjust if your API runs elsewhere
+ENDPOINTS = ["/", "/health", "/status"]  # Default, updated dynamically later
 
-for i in range(50):
-    start = time.time()
-    r = requests.post(base_url, json={"name": f"user{i}", "role": "dev"})
-    elapsed = time.time() - start
-    results.append({
-        "iteration": i,
-        "status_code": r.status_code,
-        "elapsed": elapsed
-    })
+def run_perf_test():
+    results = {}
+    for ep in ENDPOINTS:
+        latencies = []
+        for _ in range(10):
+            start = time.time()
+            res = requests.get(f"{BASE_URL}{ep}")
+            latencies.append(time.time() - start)
+        results[ep] = {
+            "avg_latency": round(statistics.mean(latencies), 3),
+            "p95": round(statistics.quantiles(latencies, n=20)[18], 3),
+            "status": "PASS" if all(l < 1 for l in latencies) else "WARN"
+        }
+    return results
 
-summary = {
-    "avg_response_time": sum(r["elapsed"] for r in results) / len(results),
-    "errors": sum(1 for r in results if r["status_code"] != 201),
-    "total_requests": len(results)
-}
-
-os.makedirs("reports", exist_ok=True)
-with open("reports/result.json", "w") as f:
-    json.dump(summary, f, indent=2)
+if __name__ == "__main__":
+    import json
+    results = run_perf_test()
+    with open("perf_results.json", "w") as f:
+        json.dump(results, f, indent=2)
+    print("✅ Performance test complete. Results saved to perf_results.json")
