@@ -6,6 +6,7 @@ api_key = os.getenv("OPENROUTER_API_KEY")
 repo = os.getenv("GITHUB_REPOSITORY")
 pr_number = os.getenv("PR_NUMBER")
 gh_token = os.getenv("GITHUB_TOKEN")
+ai_model = os.getenv("OPENROUTER_MODEL")
 
 # --- Fetch PR diff ---
 pr_url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}"
@@ -35,7 +36,7 @@ DIFF:
 client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
 
 response = client.chat.completions.create(
-    model="qwen/qwen3-coder:free",
+    model=ai_model,
     messages=[
         {"role": "system", "content": "You are a professional performance test generator for REST APIs."},
         {"role": "user", "content": prompt}
