@@ -7,8 +7,8 @@ const report = JSON.parse(fs.readFileSync(reportFile, 'utf-8'));
 // Define your thresholds
 const thresholds = {
   'http.success_rate': 1,       // must be <= 1 (or < 1 to fail)
-  'http.response_time.mean': 5,  // in ms
-  'http.response_time.p95': 10
+  'http.response_time.mean': 1,  // in ms
+  'http.response_time.p95': 1
 };
 
 // Helper to get nested value
