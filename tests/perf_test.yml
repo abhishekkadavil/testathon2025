@@ -1,0 +1,19 @@
+config:
+  target: "http://127.0.0.1:5000"
+  phases:
+    - duration: 10
+      arrivalRate: 5  # 5 requests per second for 10 seconds
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: Employee endpoint test
+    flow:
+      - get:
+          url: "/employee"
+
+  - name: Department endpoint test
+    flow:
+      - get:
+          url: "/department"
