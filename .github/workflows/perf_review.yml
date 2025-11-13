@@ -20,6 +20,10 @@ jobs:
         run: |
           pip install flask requests openai pytest
 
+      - name: Install Artillery
+        run: npm install -g artillery
+
+
       # - name: Generate new test cases (OpenRouter)
       #   env:
       #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -47,15 +51,15 @@ jobs:
             done
           fi
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-tests-results
-          path: |
-            tests/generated/perf_auto.py
-            results_perf_test.txt
-            perf_results.json
+      # - name: Upload test results
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: generated-tests-results
+      #     path: |
+      #       tests/generated/perf_auto.py
+      #       results_perf_test.txt
+      #       perf_results.json
 
       # - name: AI Performance Review
       #   env:
