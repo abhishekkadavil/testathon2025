@@ -4,7 +4,7 @@ config:
     - duration: 1
       arrivalRate: 5  # 5 requests per second for 10 seconds
   thresholds:
-    - "http.response_time.p95 < 200"   # p95 must be under 200ms
+    - "http.response_time.p95 < 0.0001"   # p95 must be under 200ms
     - "http.response_time.mean < 100"  # avg under 100ms
   defaults:
     headers:
