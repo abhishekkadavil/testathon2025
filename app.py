@@ -6,7 +6,7 @@ app = Flask(__name__)
 employees = []
 
 # GET /employee
-@app.route('/employee', methods=['GET'])
+@app.route('/employees', methods=['GET'])
 def get_employees():
     return jsonify(employees), 200
 
