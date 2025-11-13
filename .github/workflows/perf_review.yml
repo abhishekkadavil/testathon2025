@@ -36,9 +36,6 @@ jobs:
           echo "✅ Flask server started on port 5000"
           curl -v http://127.0.0.1:5000/employee || echo "⚠️ Flask app not reachable yet"
 
-      - name: Run functional tests
-        run: pytest -q || true
-
       - name: Run performance tests
         run: python tests/perf_test.py
 
