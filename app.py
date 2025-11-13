@@ -10,6 +10,10 @@ employees = []
 def get_employees():
     return jsonify(employees), 200
 
+@app.route('/department', methods=['GET'])
+def get_departments():
+    return jsonify(["HR", "Engineering"])
+
 # POST /employee
 @app.route('/employee', methods=['POST'])
 def add_employee():
