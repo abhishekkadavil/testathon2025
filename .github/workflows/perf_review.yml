@@ -44,6 +44,7 @@ jobs:
       - name: Run Artillery performance tests
         run: |
           artillery run tests/perf_test.yml -o artillery-report.json
+          artillery report artillery-report.json
 
       # - name: Run all performance tests including generated
       #   run: |
@@ -65,6 +66,7 @@ jobs:
             results_perf_test.txt
             perf_results.json
             artillery-report.json
+            artillery-report.html
 
       # - name: AI Performance Review
       #   env:
