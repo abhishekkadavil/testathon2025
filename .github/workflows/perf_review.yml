@@ -55,6 +55,7 @@ jobs:
           path: |
             tests/generated/perf_auto.py
             results_perf_test.txt
+            perf_results.json
 
       - name: AI Performance Review
         env:
