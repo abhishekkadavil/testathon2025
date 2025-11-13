@@ -66,7 +66,7 @@ jobs:
             results_perf_test.txt
             perf_results.json
             artillery-report.json
-            artillery-report.html
+            artillery-report.json.html
 
       # - name: AI Performance Review
       #   env:
