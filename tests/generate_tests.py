@@ -29,7 +29,7 @@ DIFF:
 client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
 
 response = client.chat.completions.create(
-    model="mistralai/mistral-7b-instruct:free",
+    model="qwen/qwen3-coder:free",
     messages=[
         {"role": "system", "content": "You are a professional Python test generator for REST APIs."},
         {"role": "user", "content": prompt}
