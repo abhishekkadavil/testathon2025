@@ -16,7 +16,7 @@ def run_perf_test():
         results[ep] = {
             "avg_latency": round(statistics.mean(latencies), 3),
             "p95": round(statistics.quantiles(latencies, n=20)[18], 3),
-            "status": "PASS" if all(l < 1 for l in latencies) else "WARN"
+            "status": "PASS" if all(l < 0.0001 for l in latencies) else "WARN"
         }
     return results
 
