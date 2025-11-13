@@ -46,9 +46,6 @@ jobs:
             done
           fi
 
-      - name: List generated files (debug)
-        run: ls -R tests/generated
-
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
