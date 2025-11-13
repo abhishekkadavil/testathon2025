@@ -50,7 +50,7 @@ jobs:
 
       - name: Run Artillery performance tests
         run: |
-          artillery run tests/perf_test.yml -o artillery-report.json
+          artillery run tests/perf_test.yml -o artillery-report.json --fail
           artillery report artillery-report.json
 
       # - name: Run all performance tests including generated
