@@ -36,8 +36,15 @@ jobs:
           echo "✅ Flask server started on port 5000"
           curl -v http://127.0.0.1:5000/employee || echo "⚠️ Flask app not reachable yet"
 
-      - name: Run performance tests
-        run: python tests/perf_test.py
+      - name: Run all performance tests including generated
+        run: |
+          python tests/perf_test.py > results_perf_test.txt
+          # Run all tests in tests/generated if present
+          if [ -d "tests/generated" ]; then
+            for test in tests/generated/*.py; do
+              python "$test" >> results_perf_test.txt
+            done
+          fi
 
       - name: List generated files (debug)
         run: ls -R tests/generated
@@ -49,7 +56,7 @@ jobs:
           name: generated-tests-results
           path: |
             tests/generated/test_auto.py
-            tests/generated/test_results.json
+            results_perf_test.txt
 
       - name: AI Performance Review
         env:
