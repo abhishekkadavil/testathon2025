@@ -4,9 +4,9 @@ config:
     - duration: 10
       arrivalRate: 5  # 5 requests per second for 10 seconds
   thresholds:
-    - "http.response_time.p95 < 1"     # 95th percentile < 200 ms
-    - "http.response_time.mean < 0.0001"    # mean response < 100 ms
-    - "http.success_rate > 0.99"          # 99% of requests must succeed
+    - "http.success_rate > 1"          # no system can have >100% success → guaranteed fail
+    - "http.response_time.mean < 0.0001"  # mean response < 0.0001ms → impossible
+    - "http.response_time.p95 < 0.0001"   # 95th percentile < 0.0001ms → impossible
   defaults:
     headers:
       Content-Type: "application/json"
