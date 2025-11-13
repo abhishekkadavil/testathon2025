@@ -1,28 +1,63 @@
 import requests
 import time
 import statistics
+import json
+import sys
 
-BASE_URL = "http://127.0.0.1:5000"  # Adjust if your API runs elsewhere
-ENDPOINTS = ["/", "/health", "/status"]  # Default, updated dynamically later
+BASE_URL = "http://127.0.0.1:5000"
+ENDPOINTS = ["/", "/health", "/status"]
+
+# Performance thresholds in seconds
+AVG_LATENCY_THRESHOLD = 0.1   # 100 ms
+P95_LATENCY_THRESHOLD = 0.0001
+
 
 def run_perf_test():
     results = {}
     for ep in ENDPOINTS:
         latencies = []
+
         for _ in range(10):
             start = time.time()
-            res = requests.get(f"{BASE_URL}{ep}")
-            latencies.append(time.time() - start)
+            try:
+                res = requests.get(f"{BASE_URL}{ep}", timeout=5)
+                res.raise_for_status()
+                latencies.append(time.time() - start)
+            except Exception as e:
+                results[ep] = {"status": "FAIL", "error": str(e)}
+                break  # Stop further tests for this endpoint
+
+        if not latencies:
+            results.setdefault(ep, {"status": "FAIL", "error": "No successful responses"})
+            continue
+
+        avg_latency = statistics.mean(latencies)
+        p95 = statistics.quantiles(latencies, n=20)[18]  # approximate 95th percentile
+
+        status = "PASS"
+        if avg_latency > AVG_LATENCY_THRESHOLD or p95 > P95_LATENCY_THRESHOLD:
+            status = "FAIL"
+
         results[ep] = {
-            "avg_latency": round(statistics.mean(latencies), 3),
-            "p95": round(statistics.quantiles(latencies, n=20)[18], 3),
-            "status": "PASS" if all(l < 0.0001 for l in latencies) else "WARN"
+            "avg_latency": round(avg_latency, 3),
+            "p95": round(p95, 3),
+            "status": status,
         }
+
     return results
 
+
 if __name__ == "__main__":
-    import json
     results = run_perf_test()
+
     with open("perf_results.json", "w") as f:
         json.dump(results, f, indent=2)
-    print("✅ Performance test complete. Results saved to perf_results.json")
+
+    print(json.dumps(results, indent=2))
+
+    # ✅ Fail CI if any test fails
+    if any(r["status"] != "PASS" for r in results.values()):
+        print("❌ Performance threshold not met. Failing build.")
+        sys.exit(1)
+
+    print("✅ All performance tests passed.")
