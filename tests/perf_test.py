@@ -6,7 +6,7 @@ import sys
 import os
 
 BASE_URL = "http://127.0.0.1:5000"
-ENDPOINTS = ["/", "/health", "/status"]
+ENDPOINTS = ["/employee/", "/department"]
 
 AVG_LATENCY_THRESHOLD = float(os.getenv("AVG_LATENCY_THRESHOLD", 0.1))
 P95_LATENCY_THRESHOLD = float(os.getenv("P95_LATENCY_THRESHOLD", 0.2))
