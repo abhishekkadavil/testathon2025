@@ -42,12 +42,17 @@ jobs:
       - name: Run performance tests
         run: python tests/perf_test.py
 
+      - name: List generated files (debug)
+        run: ls -R tests/generated
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: test_results.json
+          name: generated-tests-results
+          path: |
+            tests/generated/test_auto.py
+            tests/generated/test_results.json
 
       - name: AI Performance Review
         env:
