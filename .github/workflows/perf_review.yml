@@ -25,6 +25,13 @@ jobs:
         run: |
           nohup python app.py &
           sleep 5
+      - name: Generate new/updated test cases based on PR
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python tests/generate_tests.py
 
       - name: Run performance test
         run: |
