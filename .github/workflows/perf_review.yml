@@ -20,14 +20,14 @@ jobs:
         run: |
           pip install flask requests openai pytest
 
-      - name: Generate new test cases (OpenRouter)
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python tests/generate_tests.py || echo "⚠️ Skipping AI test generation due to rate limit"
+      # - name: Generate new test cases (OpenRouter)
+      #   env:
+      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     GITHUB_REPOSITORY: ${{ github.repository }}
+      #     PR_NUMBER: ${{ github.event.pull_request.number }}
+      #   run: python tests/generate_tests.py || echo "⚠️ Skipping AI test generation due to rate limit"
 
       - name: Start Flask app in background
         run: |
@@ -57,10 +57,10 @@ jobs:
             results_perf_test.txt
             perf_results.json
 
-      - name: AI Performance Review
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"
+      # - name: AI Performance Review
+      #   env:
+      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     GITHUB_REPOSITORY: ${{ github.repository }}
+      #     PR_NUMBER: ${{ github.event.pull_request.number }}
+      #   run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"
