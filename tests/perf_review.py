@@ -4,12 +4,11 @@ import re
 import requests
 from openai import OpenAI
 
-# --- Environment variables from GitLab CI ---
+# --- Environment variables from GitHub Actions ---
 api_key = os.getenv("OPENROUTER_API_KEY")
-project_path = os.getenv("CI_PROJECT_PATH")          # e.g., "username/my-flask-api"
-mr_iid = os.getenv("CI_MERGE_REQUEST_IID")          # Merge Request internal ID
-gitlab_token = os.getenv("GITLAB_TOKEN") or os.getenv("CI_JOB_TOKEN")  # prefer personal token, fallback to CI token
-gitlab_api_url = os.getenv("CI_API_V4_URL", "https://gitlab.com/api/v4")
+gh_token = os.getenv("GITHUB_TOKEN")
+repo = os.getenv("GITHUB_REPOSITORY")              # e.g. "user/repo"
+pr_number = os.getenv("PR_NUMBER")                 # provided in workflow env
 
 # --- Helper: escape markdown so AI output doesn’t get striked/bolded ---
 def escape_markdown(text: str) -> str:
@@ -19,7 +18,7 @@ def escape_markdown(text: str) -> str:
 with open("reports/result.json") as f:
     perf = json.load(f)
 
-# --- Prepare the AI prompt ---
+# --- Prepare AI prompt ---
 prompt = f"""
 Performance test results:
 {json.dumps(perf, indent=2)}
@@ -43,23 +42,23 @@ response = client.chat.completions.create(
 
 review = response.choices[0].message.content
 
-# --- Wrap in code block to preserve formatting ---
+# --- Wrap AI output in code block to avoid markdown rendering issues ---
 safe_review = f"```\n{escape_markdown(review)}\n```"
 
-# --- Post comment to the Merge Request ---
-comment_url = f"{gitlab_api_url}/projects/{project_path.replace('/', '%2F')}/merge_requests/{mr_iid}/notes"
+# --- Post comment to the GitHub PR ---
+comment_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
 
 response = requests.post(
     comment_url,
     headers={
-        "PRIVATE-TOKEN": gitlab_token,
-        "Content-Type": "application/json"
+        "Authorization": f"token {gh_token}",
+        "Accept": "application/vnd.github+json"
     },
     json={"body": safe_review}
 )
 
-if response.status_code == 201:
-    print("✅ Posted AI performance review comment to MR successfully.")
+if response.status_code in (200, 201):
+    print("✅ Posted AI performance review comment to PR successfully.")
 else:
     print(f"⚠️ Failed to post comment. Status: {response.status_code}")
     print(response.text)
