@@ -14,13 +14,19 @@ pr_data = requests.get(pr_url, headers=headers).json()
 diff_link = pr_data.get("diff_url")
 diff_text = requests.get(diff_link, headers=headers).text
 
-# --- Ask OpenRouter to generate new tests ---
+# --- Ask OpenRouter to generate new performance tests ---
 prompt = f"""
 Analyze the GitHub Pull Request diff below.
-If new Flask or FastAPI endpoints are added or changed, generate corresponding pytest test cases
-that use the `requests` library to validate these endpoints.
+If new Flask or FastAPI endpoints are added or changed, generate corresponding **performance test cases**.
 
-Return only valid Python test code.
+Guidelines for each test:
+- Use Python with the `requests` and `time` modules (no external dependencies).
+- Simulate at least 100 requests per endpoint.
+- Measure average response time, 95th percentile, and number of failed requests.
+- Print summary metrics to stdout.
+- Do NOT include functional assertions; focus purely on performance measurement.
+
+Return only valid Python code for performance tests.
 
 DIFF:
 {diff_text}
@@ -31,18 +37,18 @@ client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
 response = client.chat.completions.create(
     model="qwen/qwen3-coder:free",
     messages=[
-        {"role": "system", "content": "You are a professional Python test generator for REST APIs."},
+        {"role": "system", "content": "You are a professional performance test generator for REST APIs."},
         {"role": "user", "content": prompt}
     ]
 )
 
 test_code = response.choices[0].message.content.strip()
 
-# --- Save the generated test file ---
+# --- Save the generated performance test file ---
 os.makedirs("tests/generated", exist_ok=True)
-test_file = "tests/generated/test_auto.py"
+test_file = "tests/generated/perf_auto.py"
 
 with open(test_file, "w") as f:
     f.write(test_code)
 
-print(f"✅ Generated test file: {test_file}")
+print(f"✅ Generated performance test file: {test_file}")
