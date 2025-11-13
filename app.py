@@ -15,7 +15,7 @@ def get_departments():
     return jsonify(["HR", "Engineering"])
 
 @app.route('/employees/types', methods=['GET'])
-def get_departments():
+def get_employees_types():
     return jsonify(["Contract", "Permanent"])
 
 # POST /employee
