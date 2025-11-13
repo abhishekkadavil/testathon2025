@@ -52,7 +52,7 @@ jobs:
         with:
           name: generated-tests-results
           path: |
-            tests/generated/test_auto.py
+            tests/generated/perf_auto.py
             results_perf_test.txt
 
       - name: AI Performance Review
