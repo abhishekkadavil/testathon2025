@@ -28,11 +28,11 @@ jobs:
 
       - name: Run basic performance test
         run: |
-          python perf_test.py > result.json
+          python tests/perf_test.py > result.json
 
       - name: Generate Performance Review using OpenRouter
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python perf_review.py
+        run: python tests/perf_review.py
