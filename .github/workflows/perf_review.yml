@@ -55,15 +55,16 @@ jobs:
       #       done
       #     fi
 
-      # - name: Upload test results
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: generated-tests-results
-      #     path: |
-      #       tests/generated/perf_auto.py
-      #       results_perf_test.txt
-      #       perf_results.json
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-tests-results
+          path: |
+            tests/generated/perf_auto.py
+            results_perf_test.txt
+            perf_results.json
+            artillery-report.json
 
       # - name: AI Performance Review
       #   env:
