@@ -3,22 +3,29 @@ version: 0.1
 runson: ubuntu-latest
 
 env:
-  JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+  JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
 
 pre:
   - sudo apt-get update
   - sudo apt-get install -y openjdk-17-jdk maven python3 python3-pip
   - pip install flask requests
 
-  # Start the Flask API
+  # Start Flask API in background
   - echo "Starting Flask API..."
   - nohup python3 app.py > flask.log 2>&1 &
-  - |
-    for i in {1..20}; do
-      curl -s http://127.0.0.1:5000/employee && break
-      echo "Waiting..."
-      sleep 1
-    done
+  - bash -c '
+      echo "Waiting for Flask...";
+      for i in {1..20}; do
+        if curl -s http://127.0.0.1:5000/employee >/dev/null; then
+          echo "Flask API is up";
+          exit 0;
+        fi
+        echo Waiting...;
+        sleep 1;
+      done
+      echo "Flask API failed to start";
+      exit 1;
+    '
 
 testSuites:
   - suiteName: "Gatling API Load Test"
@@ -26,5 +33,4 @@ testSuites:
       - mvn -q gatling:test
 
 uploadArtefacts:
-  - name: gatling-report
-    path: target/gatling
+  gatling-report: "target/gatling"
