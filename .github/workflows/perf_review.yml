@@ -45,7 +45,7 @@ jobs:
           LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
         run: |
           set -e
-          hyperexecute --config hyperexecute.yaml --force
+          hyperexecute --config hyperexecute.yaml
           status=$?
           echo "Execution Status: $status"
 
