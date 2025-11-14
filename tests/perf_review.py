@@ -2,6 +2,7 @@ import os
 import json
 import requests
 from openai import OpenAI
+from github import Github
 
 api_key = os.getenv("OPENROUTER_API_KEY")
 repo = os.getenv("GITHUB_REPOSITORY")
