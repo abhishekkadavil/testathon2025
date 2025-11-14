@@ -26,24 +26,24 @@ jobs:
           java-version: "17"
           distribution: "temurin"
           
-      - name: Check if app.py changed
-        id: changes
-        run: |
-          git fetch origin ${{ github.base_ref }} --depth=1
-          if git diff --name-only origin/${{ github.base_ref }} | grep -q "app.py"; then
-            echo "app_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "app_changed=false" >> $GITHUB_OUTPUT
-          fi
+      # - name: Check if app.py changed
+      #   id: changes
+      #   run: |
+      #     git fetch origin ${{ github.base_ref }} --depth=1
+      #     if git diff --name-only origin/${{ github.base_ref }} | grep -q "app.py"; then
+      #       echo "app_changed=true" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "app_changed=false" >> $GITHUB_OUTPUT
+      #     fi
 
-      - name: Generate Gatling Tests using OpenAI
-        if: steps.changes.outputs.app_changed == 'true'
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-        run: |
-          python scripts/generate_gatling_tests.py
-          echo "🔥 AI-generated Gatling test for app.py changes"
+      # - name: Generate Gatling Tests using OpenAI
+      #   if: steps.changes.outputs.app_changed == 'true'
+      #   env:
+      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+      #   run: |
+      #     python scripts/generate_gatling_tests.py
+      #     echo "🔥 AI-generated Gatling test for app.py changes"
           
       - name: Install HyperExecute CLI
         run: |
