@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install flask requests openai pytest
+          pip install requests openai pytest pygithub
 
       - name: Setup Java & Maven
         uses: actions/setup-java@v4
