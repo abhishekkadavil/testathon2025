@@ -7,7 +7,7 @@ import io.gatling.http.Predef._
 
 class EmployeeDepartmentSimulation extends Simulation {
 
-  val baseUrl = "http://127.0.0.1:5000"
+  val baseUrl = "https://elane-recappable-submuscularly.ngrok-free.dev"
 
   val httpProtocol = http
     .baseUrl(baseUrl)
