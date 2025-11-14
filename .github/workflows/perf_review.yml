@@ -1,13 +1,12 @@
-name: API Performance Review
+name: AI Performance Testing
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  performance-test:
+  ai-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -15,25 +14,84 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          pip install flask requests openai
+          pip install flask requests openai pytest
 
-      - name: Start Flask API
+      - name: Install Artillery
+        run: npm install -g artillery
+
+
+      # - name: Generate new test cases (OpenRouter)
+      #   env:
+      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     GITHUB_REPOSITORY: ${{ github.repository }}
+      #     PR_NUMBER: ${{ github.event.pull_request.number }}
+      #   run: python tests/generate_tests.py || echo "⚠️ Skipping AI test generation due to rate limit"
+
+      - name: Start Flask app in background
         run: |
-          nohup python app.py &
-          sleep 5
+          echo "🚀 Starting Flask app..."
+          nohup python app.py > flask.log 2>&1 &
+          echo "Waiting for Flask to start..."
+          for i in {1..20}; do
+            if curl -s http://127.0.0.1:5000/employee >/dev/null; then
+              echo "✅ Flask server is up"
+              break
+            fi
+            echo "Waiting..."
+            sleep 1
+          done
 
-      - name: Run performance test
+
+      - name: Run Artillery performance tests
         run: |
-          python tests/perf_test.py
+          artillery run tests/perf_test.yml -o artillery-report.json
+          artillery report artillery-report.json
 
-      - name: Generate Performance Review
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python tests/perf_review.py
+      - name: Check performance thresholds
+        run: |
+          node tests/check_thresholds.js
+
+      # - name: Generate Artillery HTML report
+      #   run: |
+      #     artillery report artillery-report.json
+
+      # - name: Run all performance tests including generated
+      #   run: |
+      #     python tests/perf_test.py > results_perf_test.txt
+      #     # Run all tests in tests/generated if present
+      #     if [ -d "tests/generated" ]; then
+      #       for test in tests/generated/*.py; do
+      #         python "$test" >> results_perf_test.txt
+      #       done
+      #     fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-tests-results
+          path: |
+            tests/generated/perf_auto.py
+            results_perf_test.txt
+            perf_results.json
+            artillery-report.json
+            artillery-report.json.html
+
+      # - name: AI Performance Review
+      #   env:
+      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     GITHUB_REPOSITORY: ${{ github.repository }}
+      #     PR_NUMBER: ${{ github.event.pull_request.number }}
+      #   run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"
+
+      # - name: Force-fail for validation (quick, temporary)
+      #   run: |
+      #     echo "Deliberate failure to validate branch protection"
+      #     exit 1
