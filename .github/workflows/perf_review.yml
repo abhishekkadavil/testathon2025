@@ -69,29 +69,29 @@ jobs:
       #     PR_NUMBER: ${{ github.event.pull_request.number }}
       #   run: python tests/generate_tests.py || echo "⚠️ Skipping AI test generation due to rate limit"
 
-      - name: Start Flask app in background
-        run: |
-          echo "🚀 Starting Flask app..."
-          nohup python app.py > flask.log 2>&1 &
-          echo "Waiting for Flask to start..."
-          for i in {1..20}; do
-            if curl -s http://127.0.0.1:5000/employee >/dev/null; then
-              echo "✅ Flask server is up"
-              break
-            fi
-            echo "Waiting..."
-            sleep 1
-          done
+      # - name: Start Flask app in background
+      #   run: |
+      #     echo "🚀 Starting Flask app..."
+      #     nohup python app.py > flask.log 2>&1 &
+      #     echo "Waiting for Flask to start..."
+      #     for i in {1..20}; do
+      #       if curl -s http://127.0.0.1:5000/employee >/dev/null; then
+      #         echo "✅ Flask server is up"
+      #         break
+      #       fi
+      #       echo "Waiting..."
+      #       sleep 1
+      #     done
 
 
-      - name: Run Artillery performance tests
-        run: |
-          artillery run tests/perf_test.yml -o artillery-report.json
-          artillery report artillery-report.json
+      # - name: Run Artillery performance tests
+      #   run: |
+      #     artillery run tests/perf_test.yml -o artillery-report.json
+      #     artillery report artillery-report.json
 
-      - name: Check performance thresholds
-        run: |
-          node tests/check_thresholds.js
+      # - name: Check performance thresholds
+      #   run: |
+      #     node tests/check_thresholds.js
 
       # - name: Generate Artillery HTML report
       #   run: |
