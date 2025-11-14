@@ -52,9 +52,9 @@ jobs:
         run: |
           artillery run tests/perf_test.yml -o artillery-report.json
 
-      # - name: Check performance thresholds
-      #   run: |
-      #     node tests/check_thresholds.js
+      - name: Check performance thresholds
+        run: |
+          node tests/check_thresholds.js
 
       - name: Generate Artillery HTML report
         run: |
