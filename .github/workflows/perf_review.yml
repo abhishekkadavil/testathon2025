@@ -36,14 +36,14 @@ jobs:
             echo "app_changed=false" >> $GITHUB_OUTPUT
           fi
 
-      # - name: Generate Gatling Tests using OpenAI
-      #   if: steps.changes.outputs.app_changed == 'true'
-      #   env:
-      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-      #   run: |
-      #     python scripts/generate_gatling_tests.py
-      #     echo "🔥 AI-generated Gatling test for app.py changes"
+      - name: Generate Gatling Tests using OpenAI
+        if: steps.changes.outputs.app_changed == 'true'
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+        run: |
+          python scripts/generate_gatling_tests.py
+          echo "🔥 AI-generated Gatling test for app.py changes"
           
       - name: Install HyperExecute CLI
         run: |
@@ -88,11 +88,11 @@ jobs:
           path: |
             src/test/scala/ai/GeneratedSimulation.scala
 
-      # - name: AI Performance Review
-      #   env:
-      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-      #     GITHUB_REPOSITORY: ${{ github.repository }}
-      #     PR_NUMBER: ${{ github.event.pull_request.number }}
-      #   run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"      # - name: Force-fail for validation (quick, temporary)
+      - name: AI Performance Review
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"      # - name: Force-fail for validation (quick, temporary)
