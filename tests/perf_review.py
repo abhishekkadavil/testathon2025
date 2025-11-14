@@ -9,18 +9,19 @@ pr_number = os.getenv("PR_NUMBER")
 gh_token = os.getenv("GITHUB_TOKEN")
 ai_model = os.getenv("OPENROUTER_MODEL")
 
-with open("perf_results.json") as f:
-    perf_data = json.load(f)
+# Get diff
+diff = pr.get_files()
+changes = "\n".join([f.filename + "\n" + f.patch for f in diff])
 
 prompt = f"""
-You are an expert performance engineer.
-Analyze the following API performance data and summarize:
-- Which endpoints are fast or slow
-- Any anomalies or spikes
-- Give short, actionable feedback
+Review the following pull request diff. Provide:
+- Code issues
+- Security concerns
+- Suggested improvements
+- Highlight specific lines
 
-Data:
-{json.dumps(perf_data, indent=2)}
+Diff:
+{changes}
 """
 
 client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
@@ -33,7 +34,7 @@ response = client.chat.completions.create(
     ]
 )
 
-review_comment = response.choices[0].message.content.strip()
+review_comment = response.choices[0].message["content"]
 
 # --- Post to GitHub PR ---
 comment_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
