@@ -2,6 +2,13 @@ version: 0.1
 
 runson: linux
 
+report: true
+
+# Upload Gatling HTML report
+artefacts:
+  gatling-report:
+    - target/gatling/**
+
 env:
   JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
 
