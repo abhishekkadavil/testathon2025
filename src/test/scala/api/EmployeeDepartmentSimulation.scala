@@ -34,15 +34,15 @@ class EmployeeDepartmentSimulation extends Simulation {
   )
     .protocols(httpProtocol)
   // PASS
-    // .assertions(
-    //   global.successfulRequests.percent.gt(50),
-    //   global.responseTime.mean.lt(5000),
-    //   global.responseTime.percentile4.lt(8000)
-    // )
-  // FAIL
     .assertions(
-        global.successfulRequests.percent.gt(95),        // Pass if >95% succeed
-        global.responseTime.mean.lt(300),                // mean < 300ms
-        global.responseTime.percentile4.lt(800)          // p99 < 800ms
-      )
+      global.successfulRequests.percent.gt(50),
+      global.responseTime.mean.lt(5000),
+      global.responseTime.percentile4.lt(8000)
+    )
+  // FAIL
+    // .assertions(
+    //     global.successfulRequests.percent.gt(95),        // Pass if >95% succeed
+    //     global.responseTime.mean.lt(300),                // mean < 300ms
+    //     global.responseTime.percentile4.lt(800)          // p99 < 800ms
+    //   )
 }
