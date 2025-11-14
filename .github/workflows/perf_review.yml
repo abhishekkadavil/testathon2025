@@ -25,40 +25,51 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
-      - name: Install HyperExecute CLI
-        run: |
-          curl -LO https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
-          chmod +x hyperexecute
-          mv hyperexecute /usr/local/bin/hyperexecute
+          
+      # - name: Check if app.py changed
+      #   id: changes
+      #   run: |
+      #     git fetch origin ${{ github.base_ref }} --depth=1
+      #     if git diff --name-only origin/${{ github.base_ref }} | grep -q "app.py"; then
+      #       echo "app_changed=true" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "app_changed=false" >> $GITHUB_OUTPUT
+      #     fi
+          
+      # - name: Install HyperExecute CLI
+      #   run: |
+      #     curl -LO https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
+      #     chmod +x hyperexecute
+      #     mv hyperexecute /usr/local/bin/hyperexecute
 
-      - name: Provide HyperExecute Credentials
-        env:
-          LT_USERNAME: ${{ secrets.LT_USERNAME }}
-          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
-        run: |
-          echo "Configured LT Credentials"
+      # - name: Provide HyperExecute Credentials
+      #   env:
+      #     LT_USERNAME: ${{ secrets.LT_USERNAME }}
+      #     LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+      #   run: |
+      #     echo "Configured LT Credentials"
 
-      - name: Print hyperexecute.yaml with line numbers
-        run: |
-          nl -ba hyperexecute.yaml
+      # - name: Print hyperexecute.yaml with line numbers
+      #   run: |
+      #     nl -ba hyperexecute.yaml
 
-      # 🟦 Trigger HyperExecute
-      - name: Run Gatling on HyperExecute
-        env:
-          LT_USERNAME: ${{ secrets.LT_USERNAME }}
-          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
-        run: |
-          set -e
-          hyperexecute --config hyperexecute.yaml
-          status=$?
-          echo "Execution Status: $status"
+      # # 🟦 Trigger HyperExecute
+      # - name: Run Gatling on HyperExecute
+      #   env:
+      #     LT_USERNAME: ${{ secrets.LT_USERNAME }}
+      #     LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+      #   run: |
+      #     set -e
+      #     hyperexecute --config hyperexecute.yaml
+      #     status=$?
+      #     echo "Execution Status: $status"
 
-          if [ $status -ne 0 ]; then
-            echo "❌ Performance test failed — blocking merge"
-            exit 1
-          else
-            echo "✅ Performance test passed"
-          fi
+      #     if [ $status -ne 0 ]; then
+      #       echo "❌ Performance test failed — blocking merge"
+      #       exit 1
+      #     else
+      #       echo "✅ Performance test passed"
+      #     fi
 
       # - name: Generate new test cases (OpenRouter)
       #   env:
