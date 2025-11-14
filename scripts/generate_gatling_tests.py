@@ -1,11 +1,12 @@
-import openai
 import os
+import requests
 from pathlib import Path
 
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+AI_MODEL = os.getenv("OPENROUTER_MODEL")
 
-openai.api_key  = os.getenv("OPENROUTER_API_KEY")
-ai_model = os.getenv("OPENROUTER_MODEL")
-
+if not OPENROUTER_API_KEY:
+    raise Exception("OPENROUTER_API_KEY is missing")
 
 APP_FILE = "app.py"
 TARGET_FILE = Path("src/test/scala/ai/GeneratedSimulation.scala")
@@ -28,13 +29,25 @@ Now generate a Gatling Scala Simulation that:
 Return ONLY valid Scala code.
 """
 
-response = openai.chat.completions.create(
-    model=ai_model,
-    messages=[{"role": "user", "content": prompt}],
-    temperature=0.2
-)
+url = "https://openrouter.ai/api/v1/chat/completions"
 
-scala_code = response.choices[0].message.content.strip()
+payload = {
+    "model": AI_MODEL,
+    "messages": [
+        {"role": "user", "content": prompt}
+    ]
+}
+
+headers = {
+    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+    "HTTP-Referer": "https://github.com/your_repo",
+    "X-Title": "Gatling Test Generator"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+response.raise_for_status()
+
+scala_code = response.json()["choices"][0]["message"]["content"].strip()
 TARGET_FILE.write_text(scala_code)
 
 print(f"Generated AI Gatling test at: {TARGET_FILE}")
