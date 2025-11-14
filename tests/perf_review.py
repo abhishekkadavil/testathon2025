@@ -5,7 +5,7 @@ from openai import OpenAI
 from github import Github
 
 api_key = os.getenv("OPENROUTER_API_KEY")
-repo = os.getenv("GITHUB_REPOSITORY")
+repo_name = os.getenv("GITHUB_REPOSITORY")
 pr_number = os.getenv("PR_NUMBER")
 gh_token = os.getenv("GITHUB_TOKEN")
 ai_model = os.getenv("OPENROUTER_MODEL")
@@ -17,7 +17,10 @@ pr = repo.get_pull(int(pr_number))
 
 # --- Get diff ---
 diff = pr.get_files()
-changes = "\n".join([f.filename + "\n" + (f.patch or "") for f in diff])
+changes = "\n".join([
+    f"{f.filename}\n{f.patch or ''}"
+    for f in diff
+])
 
 prompt = f"""
 Review the following pull request diff. Provide:
@@ -43,7 +46,8 @@ response = client.chat.completions.create(
 review_comment = response.choices[0].message["content"]
 
 # --- Post to GitHub PR ---
-comment_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
+comment_url = f"https://api.github.com/repos/{repo_name}/issues/{pr_number}/comments"
+
 requests.post(
     comment_url,
     headers={"Authorization": f"token {gh_token}"},
