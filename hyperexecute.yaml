@@ -12,7 +12,8 @@ pre:
 
 testSuites:
   - suiteName: "Gatling API Load Test"
-    tests: "mvn -q gatling:test"
+    tests:
+      - mvn -q gatling:test
 
 post:
   - echo "Finished execution"
