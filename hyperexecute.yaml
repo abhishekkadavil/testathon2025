@@ -7,9 +7,6 @@ uploadArtifacts:
     - name: Executed-Job-Artifacts #user defined name of the artifact
       path:
         - ./target/gatling/** #path of the generated artifact
-# artefacts:
-#   gatling-report:
-#     - ./target/gatling/**
 
 env:
   JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
@@ -28,8 +25,3 @@ post:
   - pwd
   - echo "Listing final report directory:"
   - ls -R ./target/gatling || echo "NO REPORT FOUND"
-
-# uploadArtefacts:
-#   - path:
-#       - $WORKSPACE/target/gatling
-#     name: gatling-report
