@@ -5,9 +5,9 @@ config:
       arrivalRate: 5  # 5 requests per second for 10 seconds
   ensure:
     thresholds:
-      http.success_rate: ">1"
-      http.response_time.mean: "<0.0001"
-      http.response_time.p95: "<0.0001"
+      - http.success_rate: ">1"
+      - http.response_time.mean: "<0.0001"
+      - http.response_time.p95: "<0.0001"
     defaults:
       headers:
         Content-Type: "application/json"
