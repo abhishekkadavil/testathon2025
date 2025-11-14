@@ -9,6 +9,8 @@ pr_number = os.getenv("PR_NUMBER")
 gh_token = os.getenv("GITHUB_TOKEN")
 ai_model = os.getenv("OPENROUTER_MODEL")
 
+pr = repo.get_pull(int(pr_number))
+
 # Get diff
 diff = pr.get_files()
 changes = "\n".join([f.filename + "\n" + f.patch for f in diff])
