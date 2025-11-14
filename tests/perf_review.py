@@ -35,15 +35,8 @@ Review the following pull request diff and provide ONLY:
 - Opportunities for algorithmic or structural optimization
 - Line-specific performance comments
 
-Do NOT comment on:
-- security
-- style
-- formatting
-- documentation
-- naming
-- general code quality
-
-Focus strictly on performance.
+Your response MUST focus strictly on performance.
+Ignore anything unrelated to performance.
 
 Diff:
 {changes}
