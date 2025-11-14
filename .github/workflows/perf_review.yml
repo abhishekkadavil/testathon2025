@@ -38,6 +38,10 @@ jobs:
         run: |
           echo "Configured LT Credentials"
 
+      - name: Print hyperexecute.yaml with line numbers
+        run: |
+          nl -ba hyperexecute.yaml
+
       # 🟦 Trigger HyperExecute
       - name: Run Gatling on HyperExecute
         env:
