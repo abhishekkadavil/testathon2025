@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from openai import OpenAI
-from github import Github
+from github import Github, Auth
 
 api_key = os.getenv("OPENROUTER_API_KEY")
 repo_name = os.getenv("GITHUB_REPOSITORY")
@@ -11,7 +11,7 @@ gh_token = os.getenv("GITHUB_TOKEN")
 ai_model = os.getenv("OPENROUTER_MODEL")
 
 # --- GitHub client ---
-gh = Github(gh_token)
+gh = Github(auth=Auth.Token(gh_token))
 repo = gh.get_repo(repo_name)
 pr = repo.get_pull(int(pr_number))
 
@@ -43,7 +43,7 @@ response = client.chat.completions.create(
     ]
 )
 
-review_comment = response.choices[0].message["content"]
+review_comment = response.choices[0].message.content
 
 # --- Post to GitHub PR ---
 comment_url = f"https://api.github.com/repos/{repo_name}/issues/{pr_number}/comments"
