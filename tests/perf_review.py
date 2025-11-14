@@ -23,11 +23,27 @@ changes = "\n".join([
 ])
 
 prompt = f"""
-Review the following pull request diff. Provide:
-- Code issues
-- Security concerns
-- Suggested improvements
-- Highlight specific lines
+You are an expert in software performance optimization.
+
+Review the following pull request diff and provide ONLY:
+
+- Performance bottlenecks
+- Inefficient patterns
+- High-complexity code paths
+- Memory or CPU inefficiencies
+- Redundant operations
+- Opportunities for algorithmic or structural optimization
+- Line-specific performance comments
+
+Do NOT comment on:
+- security
+- style
+- formatting
+- documentation
+- naming
+- general code quality
+
+Focus strictly on performance.
 
 Diff:
 {changes}
