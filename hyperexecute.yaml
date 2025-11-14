@@ -3,6 +3,9 @@ version: 0.1
 runson: linux
 
 report: true
+artefacts:
+  gatling-report:
+    - ./target/gatling/**
 
 env:
   JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
@@ -22,7 +25,7 @@ post:
   - echo "Listing final report directory:"
   - ls -R ./target/gatling || echo "NO REPORT FOUND"
 
-uploadArtefacts:
-  - path:
-      - $WORKSPACE/target/gatling
-    name: gatling-report
+# uploadArtefacts:
+#   - path:
+#       - $WORKSPACE/target/gatling
+#     name: gatling-report
