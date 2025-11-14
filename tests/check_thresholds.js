@@ -9,7 +9,7 @@ const p95 = metrics.p95;
 // Fail conditions
 let failed = false;
 
-if (mean > 300) {
+if (mean > 0.5) {
   console.error("❌ Mean response time too high:", mean);
   failed = true;
 }
