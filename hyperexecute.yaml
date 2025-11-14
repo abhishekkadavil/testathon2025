@@ -11,7 +11,7 @@ pre:
   - pip install flask requests
   - echo "Starting Flask API..."
   - nohup python3 app.py > flask.log 2>&1 &
-  - bash -c '
+  - |
       echo "Waiting for Flask...";
       for i in {1..20}; do
         if curl -s http://127.0.0.1:5000/employee >/dev/null; then
@@ -23,13 +23,16 @@ pre:
       done
       echo "Flask API failed to start";
       exit 1;
-    '
 
 testSuites:
   - suiteName: "Gatling API Load Test"
     tests:
       - mvn -q gatling:test
 
+post:
+  - echo "Finished execution"
+
 uploadArtefacts:
-  - name: gatling-report
-    path: target/gatling
+  - path:
+      - "target/gatling"
+    name: gatling-report
