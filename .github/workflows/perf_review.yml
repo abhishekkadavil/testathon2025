@@ -91,6 +91,7 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"      # - name: Force-fail for validation (quick, temporary)
