@@ -7,13 +7,12 @@ env:
 
 pre:
   - sudo apt-get update
-  - sudo apt-get install -y openjdk-17-jdk maven
+  - sudo apt-get install -y openjdk-17-jdk maven python3 python3-pip
+  - pip install flask requests
 
-  # Start your Flask API (same as GitHub workflow)
-  - echo "Starting Flask app..."
+  # Start the Flask API
+  - echo "Starting Flask API..."
   - nohup python3 app.py > flask.log 2>&1 &
-
-  - echo "Waiting for API..."
   - |
     for i in {1..20}; do
       curl -s http://127.0.0.1:5000/employee && break
@@ -22,11 +21,10 @@ pre:
     done
 
 testSuites:
-  - suiteName: "Gatling Load Test"
+  - suiteName: "Gatling API Load Test"
     tests:
       - mvn -q gatling:test
 
-# Upload Gatling HTML reports
 uploadArtefacts:
-  - name: "gatling-reports"
-    path: "target/gatling"
+  - name: gatling-report
+    path: target/gatling
