@@ -50,8 +50,8 @@ response.raise_for_status()
 scala_code = response.json()["choices"][0]["message"]["content"].strip()
 
 # REMOVE markdown fences if present
-if scala_code.startswith("```"):
-    scala_code = scala_code.split("```")[1]  # remove first fence
+if scala_code.startswith("```scala"):
+    scala_code = scala_code.split("```scala")[1]  # remove first fence
     scala_code = scala_code.replace("```", "").strip()  # remove closing fence
 
 TARGET_FILE.write_text(scala_code)
