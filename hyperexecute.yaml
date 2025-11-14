@@ -1,6 +1,6 @@
 version: 0.1
 
-runson: ubuntu-latest
+runson: linux
 
 env:
   JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
