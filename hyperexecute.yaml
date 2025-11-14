@@ -9,8 +9,6 @@ pre:
   - sudo apt-get update
   - sudo apt-get install -y openjdk-17-jdk maven python3 python3-pip
   - pip install flask requests
-
-  # Start Flask API in background
   - echo "Starting Flask API..."
   - nohup python3 app.py > flask.log 2>&1 &
   - bash -c '
@@ -20,7 +18,7 @@ pre:
           echo "Flask API is up";
           exit 0;
         fi
-        echo Waiting...;
+        echo "Waiting...";
         sleep 1;
       done
       echo "Flask API failed to start";
@@ -33,4 +31,5 @@ testSuites:
       - mvn -q gatling:test
 
 uploadArtefacts:
-  gatling-report: "target/gatling"
+  - name: gatling-report
+    path: target/gatling
