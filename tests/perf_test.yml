@@ -3,13 +3,14 @@ config:
   phases:
     - duration: 10
       arrivalRate: 5  # 5 requests per second for 10 seconds
-  thresholds:
-    http.success_rate: ">1"
-    http.response_time.mean: "<0.0001"
-    http.response_time.p95: "<0.0001"
-  defaults:
-    headers:
-      Content-Type: "application/json"
+  ensure:
+    thresholds:
+      http.success_rate: ">1"
+      http.response_time.mean: "<0.0001"
+      http.response_time.p95: "<0.0001"
+    defaults:
+      headers:
+        Content-Type: "application/json"
 
 scenarios:
   - name: Employee endpoint test
