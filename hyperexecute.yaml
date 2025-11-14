@@ -13,11 +13,16 @@ pre:
 
 testSuites:
   - "mvn -q clean gatling:test"
+  - echo "Listing Gatling reports:"
+  - ls -R ./target/gatling || echo "GATLING FOLDER NOT FOUND"
 
 post:
   - echo "Finished execution"
+  - pwd
+  - echo "Listing final report directory:"
+  - ls -R ./target/gatling || echo "NO REPORT FOUND"
 
 uploadArtefacts:
   - path:
-      - ./target/gatling
+      - $WORKSPACE/target/gatling
     name: gatling-report
