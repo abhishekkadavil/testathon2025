@@ -11,9 +11,7 @@ pre:
   - echo "Using external API — no local server required"
 
 testSuites:
-  - suiteName: "Gatling API Load Test"
-    tests:
-      - mvn -q gatling:test
+  - "mvn -q clean gatling:test"
 
 post:
   - echo "Finished execution"
