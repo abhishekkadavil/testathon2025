@@ -54,6 +54,17 @@ if scala_code.startswith("```scala"):
     scala_code = scala_code.split("```scala")[1]  # remove first fence
     scala_code = scala_code.replace("```", "").strip()  # remove closing fence
 
+# Remove OpenAI/OpenRouter boundary tokens
+bad_tokens = [
+    "<｜begin▁of▁sentence｜>",
+    "<｜end▁of▁sentence｜>",
+    "<|begin_of_sentence|>",
+    "<|end_of_sentence|>"
+]
+
+for t in bad_tokens:
+    scala_code = scala_code.replace(t, "")
+
 TARGET_FILE.write_text(scala_code)
 
 print(f"Generated AI Gatling test at: {TARGET_FILE}")
