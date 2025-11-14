@@ -69,34 +69,6 @@ jobs:
       #     PR_NUMBER: ${{ github.event.pull_request.number }}
       #   run: python tests/generate_tests.py || echo "⚠️ Skipping AI test generation due to rate limit"
 
-      # - name: Start Flask app in background
-      #   run: |
-      #     echo "🚀 Starting Flask app..."
-      #     nohup python app.py > flask.log 2>&1 &
-      #     echo "Waiting for Flask to start..."
-      #     for i in {1..20}; do
-      #       if curl -s http://127.0.0.1:5000/employee >/dev/null; then
-      #         echo "✅ Flask server is up"
-      #         break
-      #       fi
-      #       echo "Waiting..."
-      #       sleep 1
-      #     done
-
-
-      # - name: Run Artillery performance tests
-      #   run: |
-      #     artillery run tests/perf_test.yml -o artillery-report.json
-      #     artillery report artillery-report.json
-
-      # - name: Check performance thresholds
-      #   run: |
-      #     node tests/check_thresholds.js
-
-      # - name: Generate Artillery HTML report
-      #   run: |
-      #     artillery report artillery-report.json
-
       # - name: Run all performance tests including generated
       #   run: |
       #     python tests/perf_test.py > results_perf_test.txt
@@ -118,13 +90,6 @@ jobs:
       #       perf_results.json
       #       artillery-report.json
       #       artillery-report.json.html
-
-      - name: Upload HyperExecute Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hyperexecute-artifacts
-          path: "./*"
 
       # - name: AI Performance Review
       #   env:
