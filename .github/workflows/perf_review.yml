@@ -20,9 +20,41 @@ jobs:
         run: |
           pip install flask requests openai pytest
 
-      - name: Install Artillery
-        run: npm install -g artillery
+      - name: Setup Java & Maven
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+      - name: Install HyperExecute CLI
+        run: |
+          curl -LO https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
+          chmod +x hyperexecute
+          mv hyperexecute /usr/local/bin/hyperexecute
 
+      - name: Provide HyperExecute Credentials
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: |
+          echo "Configured LT Credentials"
+
+      # 🟦 Trigger HyperExecute
+      - name: Run Gatling on HyperExecute
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: |
+          set -e
+          hyperexecute --config hyperexecute.yaml --force
+          status=$?
+          echo "Execution Status: $status"
+
+          if [ $status -ne 0 ]; then
+            echo "❌ Performance test failed — blocking merge"
+            exit 1
+          else
+            echo "✅ Performance test passed"
+          fi
 
       # - name: Generate new test cases (OpenRouter)
       #   env:
@@ -71,17 +103,24 @@ jobs:
       #       done
       #     fi
 
-      - name: Upload test results
+      # - name: Upload test results
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: generated-tests-results
+      #     path: |
+      #       tests/generated/perf_auto.py
+      #       results_perf_test.txt
+      #       perf_results.json
+      #       artillery-report.json
+      #       artillery-report.json.html
+
+      - name: Upload HyperExecute Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: generated-tests-results
-          path: |
-            tests/generated/perf_auto.py
-            results_perf_test.txt
-            perf_results.json
-            artillery-report.json
-            artillery-report.json.html
+          name: hyperexecute-artifacts
+          path: "./*"
 
       # - name: AI Performance Review
       #   env:
