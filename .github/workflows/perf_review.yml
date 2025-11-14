@@ -39,65 +39,46 @@ jobs:
       - name: Generate Gatling Tests using OpenAI
         if: steps.changes.outputs.app_changed == 'true'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
         run: |
           python scripts/generate_gatling_tests.py
           echo "🔥 AI-generated Gatling test for app.py changes"
           
-      # - name: Install HyperExecute CLI
-      #   run: |
-      #     curl -LO https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
-      #     chmod +x hyperexecute
-      #     mv hyperexecute /usr/local/bin/hyperexecute
+      - name: Install HyperExecute CLI
+        run: |
+          curl -LO https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
+          chmod +x hyperexecute
+          mv hyperexecute /usr/local/bin/hyperexecute
 
-      # - name: Provide HyperExecute Credentials
-      #   env:
-      #     LT_USERNAME: ${{ secrets.LT_USERNAME }}
-      #     LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
-      #   run: |
-      #     echo "Configured LT Credentials"
+      - name: Provide HyperExecute Credentials
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: |
+          echo "Configured LT Credentials"
 
-      # - name: Print hyperexecute.yaml with line numbers
-      #   run: |
-      #     nl -ba hyperexecute.yaml
+      - name: Print hyperexecute.yaml with line numbers
+        run: |
+          nl -ba hyperexecute.yaml
 
-      # # 🟦 Trigger HyperExecute
-      # - name: Run Gatling on HyperExecute
-      #   env:
-      #     LT_USERNAME: ${{ secrets.LT_USERNAME }}
-      #     LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
-      #   run: |
-      #     set -e
-      #     hyperexecute --config hyperexecute.yaml
-      #     status=$?
-      #     echo "Execution Status: $status"
+      # 🟦 Trigger HyperExecute
+      - name: Run Gatling on HyperExecute
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: |
+          set -e
+          hyperexecute --config hyperexecute.yaml
+          status=$?
+          echo "Execution Status: $status"
 
-      #     if [ $status -ne 0 ]; then
-      #       echo "❌ Performance test failed — blocking merge"
-      #       exit 1
-      #     else
-      #       echo "✅ Performance test passed"
-      #     fi
-
-      # - name: Generate new test cases (OpenRouter)
-      #   env:
-      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     GITHUB_REPOSITORY: ${{ github.repository }}
-      #     PR_NUMBER: ${{ github.event.pull_request.number }}
-      #   run: python tests/generate_tests.py || echo "⚠️ Skipping AI test generation due to rate limit"
-
-      # - name: Run all performance tests including generated
-      #   run: |
-      #     python tests/perf_test.py > results_perf_test.txt
-      #     # Run all tests in tests/generated if present
-      #     if [ -d "tests/generated" ]; then
-      #       for test in tests/generated/*.py; do
-      #         python "$test" >> results_perf_test.txt
-      #       done
-      #     fi
+          if [ $status -ne 0 ]; then
+            echo "❌ Performance test failed — blocking merge"
+            exit 1
+          else
+            echo "✅ Performance test passed"
+          fi
 
       - name: Upload test results
         if: always()
