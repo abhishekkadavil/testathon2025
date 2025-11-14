@@ -9,11 +9,14 @@ pr_number = os.getenv("PR_NUMBER")
 gh_token = os.getenv("GITHUB_TOKEN")
 ai_model = os.getenv("OPENROUTER_MODEL")
 
+# --- GitHub client ---
+gh = Github(gh_token)
+repo = gh.get_repo(repo_name)
 pr = repo.get_pull(int(pr_number))
 
-# Get diff
+# --- Get diff ---
 diff = pr.get_files()
-changes = "\n".join([f.filename + "\n" + f.patch for f in diff])
+changes = "\n".join([f.filename + "\n" + (f.patch or "") for f in diff])
 
 prompt = f"""
 Review the following pull request diff. Provide:
