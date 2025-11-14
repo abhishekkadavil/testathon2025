@@ -7,11 +7,8 @@ env:
 
 pre:
   - sudo apt-get update
-  - sudo apt-get install -y openjdk-17-jdk maven python3 python3-pip
-  - pip install flask requests
-  - echo "Starting Flask API..."
-  - nohup python3 app.py > flask.log 2>&1
-  - echo "Waiting for Flask..."; for i in {1..20}; do if curl -s http://127.0.0.1:5000/employee >/dev/null; then echo "Flask API is up"; exit 0; fi; echo "Waiting..."; sleep 1; done; echo "Flask API failed to start"; exit 1;
+  - sudo apt-get install -y openjdk-17-jdk maven
+  - echo "Using external API — no local server required"
 
 testSuites:
   - suiteName: "Gatling API Load Test"
