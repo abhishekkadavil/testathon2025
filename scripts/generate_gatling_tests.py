@@ -2,7 +2,10 @@ import openai
 import os
 from pathlib import Path
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+openai.api_key  = os.getenv("OPENROUTER_API_KEY")
+ai_model = os.getenv("OPENROUTER_MODEL")
+
 
 APP_FILE = "app.py"
 TARGET_FILE = Path("src/test/scala/ai/GeneratedSimulation.scala")
@@ -26,7 +29,7 @@ Return ONLY valid Scala code.
 """
 
 response = openai.chat.completions.create(
-    model="gpt-4.1",
+    model=ai_model,
     messages=[{"role": "user", "content": prompt}],
     temperature=0.2
 )
