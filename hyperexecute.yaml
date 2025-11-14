@@ -3,9 +3,13 @@ version: 0.1
 runson: linux
 
 report: true
-artefacts:
-  gatling-report:
-    - ./target/gatling/**
+uploadArtifacts:
+    - name: Executed-Job-Artifacts #user defined name of the artifact
+      path:
+        - ./target/gatling/** #path of the generated artifact
+# artefacts:
+#   gatling-report:
+#     - ./target/gatling/**
 
 env:
   JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
