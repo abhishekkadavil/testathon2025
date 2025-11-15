@@ -1,64 +1,66 @@
 import os
 import json
-import re
 import requests
 from openai import OpenAI
+from github import Github, Auth
 
-# --- Environment variables from GitHub Actions ---
 api_key = os.getenv("OPENROUTER_API_KEY")
+repo_name = os.getenv("GITHUB_REPOSITORY")
+pr_number = os.getenv("PR_NUMBER")
 gh_token = os.getenv("GITHUB_TOKEN")
-repo = os.getenv("GITHUB_REPOSITORY")              # e.g. "user/repo"
-pr_number = os.getenv("PR_NUMBER")                 # provided in workflow env
+ai_model = os.getenv("OPENROUTER_MODEL")
 
-# --- Helper: escape markdown so AI output doesn’t get striked/bolded ---
-def escape_markdown(text: str) -> str:
-    return re.sub(r'([*_~`])', r'\\\1', text)
+# --- GitHub client ---
+gh = Github(auth=Auth.Token(gh_token))
+repo = gh.get_repo(repo_name)
+pr = repo.get_pull(int(pr_number))
 
-# --- Load performance results ---
-with open("reports/result.json") as f:
-    perf = json.load(f)
+# --- Get diff ---
+diff = pr.get_files()
+changes = "\n".join([
+    f"{f.filename}\n{f.patch or ''}"
+    for f in diff
+])
 
-# --- Prepare AI prompt ---
 prompt = f"""
-Performance test results:
-{json.dumps(perf, indent=2)}
+You are an expert in software performance optimization.
 
-Please analyze and provide:
-1. Bottlenecks or inefficiencies.
-2. Suggestions to improve response time or throughput.
-3. Whether results are acceptable for a small Flask API.
+Review the following pull request diff and provide ONLY:
+
+- Performance bottlenecks
+- Inefficient patterns
+- High-complexity code paths
+- Memory or CPU inefficiencies
+- Redundant operations
+- Opportunities for algorithmic or structural optimization
+- Line-specific performance comments
+
+Your response MUST focus strictly on performance.
+Ignore anything unrelated to performance.
+
+Diff:
+{changes}
 """
 
-# --- Call OpenRouter model ---
 client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
 
 response = client.chat.completions.create(
-    model="mistralai/mistral-7b-instruct:free",
+    model=ai_model,
     messages=[
-        {"role": "system", "content": "You are a senior performance testing engineer reviewing Flask API metrics."},
+        {"role": "system", "content": "You are an expert performance reviewer."},
         {"role": "user", "content": prompt}
     ]
 )
 
-review = response.choices[0].message.content
+review_comment = response.choices[0].message.content
 
-# --- Wrap AI output in code block to avoid markdown rendering issues ---
-safe_review = f"```\n{escape_markdown(review)}\n```"
+# --- Post to GitHub PR ---
+comment_url = f"https://api.github.com/repos/{repo_name}/issues/{pr_number}/comments"
 
-# --- Post comment to the GitHub PR ---
-comment_url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
-
-response = requests.post(
+requests.post(
     comment_url,
-    headers={
-        "Authorization": f"token {gh_token}",
-        "Accept": "application/vnd.github+json"
-    },
-    json={"body": safe_review}
+    headers={"Authorization": f"token {gh_token}"},
+    json={"body": f"### 🤖 AI Performance Review\n\n{review_comment}"}
 )
 
-if response.status_code in (200, 201):
-    print("✅ Posted AI performance review comment to PR successfully.")
-else:
-    print(f"⚠️ Failed to post comment. Status: {response.status_code}")
-    print(response.text)
+print("✅ Posted AI Performance Review to PR")

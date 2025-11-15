@@ -1,13 +1,12 @@
-name: API Performance Review
+name: AI Performance Testing
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  performance-test:
+  ai-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -15,25 +14,85 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          pip install flask requests openai
+          pip install requests openai pytest pygithub
 
-      - name: Start Flask API
+      - name: Setup Java & Maven
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          
+      - name: Check if app.py changed
+        id: changes
         run: |
-          nohup python app.py &
-          sleep 5
+          git fetch origin ${{ github.base_ref }} --depth=1
+          if git diff --name-only origin/${{ github.base_ref }} | grep -q "app.py"; then
+            echo "app_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "app_changed=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Run performance test
-        run: |
-          python tests/perf_test.py
-
-      - name: Generate Performance Review
+      - name: Generate Gatling Tests using OpenAI
+        if: steps.changes.outputs.app_changed == 'true'
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python tests/perf_review.py
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+        run: |
+          python scripts/generate_gatling_tests.py
+          echo "🔥 AI-generated Gatling test for app.py changes"
+          
+      - name: Install HyperExecute CLI
+        run: |
+          curl -LO https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
+          chmod +x hyperexecute
+          mv hyperexecute /usr/local/bin/hyperexecute
+
+      - name: Provide HyperExecute Credentials
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: |
+          echo "Configured LT Credentials"
+
+      - name: Print hyperexecute.yaml with line numbers
+        run: |
+          nl -ba hyperexecute.yaml
+
+      # 🟦 Trigger HyperExecute
+      - name: Run Gatling on HyperExecute
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: |
+          set -e
+          hyperexecute --config hyperexecute.yaml
+          status=$?
+          echo "Execution Status: $status"
+
+          if [ $status -ne 0 ]; then
+            echo "❌ Performance test failed — blocking merge"
+            exit 1
+          else
+            echo "✅ Performance test passed"
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-tests-results
+          path: |
+            src/test/scala/ai/GeneratedSimulation.scala
+
+      # - name: AI Performance Review
+      #   env:
+      #     OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+      #     GITHUB_REPOSITORY: ${{ github.repository }}
+      #     PR_NUMBER: ${{ github.event.pull_request.number }}
+      #   run: python tests/perf_review.py || echo "⚠️ Skipping AI performance review due to rate limit"      # - name: Force-fail for validation (quick, temporary)

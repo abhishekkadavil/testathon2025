@@ -1,0 +1,29 @@
+version: 0.1
+
+runson: linux
+
+report: true
+uploadArtifacts:
+    - name: Executed-Job-Artifacts #user defined name of the artifact
+      path:
+        - ./target/gatling/** #path of the generated artifact
+
+env:
+  JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
+
+pre:
+  - sudo apt-get update
+  - sudo apt-get install -y openjdk-17-jdk maven
+
+testSuites:
+  # - "mvn -q clean gatling:test"
+  - mvn -q clean gatling:test -Dgatling.simulationClass=ai.GeneratedSimulation
+  # - mvn -q clean gatling:test -Dgatling.simulationClass=api.EmployeeDepartmentSimulation
+  - echo "Listing Gatling reports:"
+  - ls -R ./target/gatling || echo "GATLING FOLDER NOT FOUND"
+
+post:
+  - echo "Finished execution"
+  - pwd
+  - echo "Listing final report directory:"
+  - ls -R ./target/gatling || echo "NO REPORT FOUND"

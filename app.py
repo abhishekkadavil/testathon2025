@@ -10,6 +10,14 @@ employees = []
 def get_employees():
     return jsonify(employees), 200
 
+@app.route('/department', methods=['GET'])
+def get_departments():
+    return jsonify(["HR", "Engineering"])
+
+@app.route('/employees/types', methods=['GET'])
+def get_employees_types():
+    return jsonify(["Contract", "Permanent"])
+
 # POST /employee
 @app.route('/employee', methods=['POST'])
 def add_employee():
@@ -26,5 +34,5 @@ def add_employee():
     return jsonify(employee), 201
 
 if __name__ == '__main__':
-    app.run(debug=True)
+     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
