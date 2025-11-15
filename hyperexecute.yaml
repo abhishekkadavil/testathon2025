@@ -17,8 +17,8 @@ pre:
 
 testSuites:
   # - "mvn -q clean gatling:test"
-  # - mvn -q clean gatling:test -Dgatling.simulationClass=ai.GeneratedSimulation
-  - mvn -q clean gatling:test -Dgatling.simulationClass=api.EmployeeDepartmentSimulation
+  - mvn -q clean gatling:test -Dgatling.simulationClass=ai.GeneratedSimulation
+  # - mvn -q clean gatling:test -Dgatling.simulationClass=api.EmployeeDepartmentSimulation
   - echo "Listing Gatling reports:"
   - ls -R ./target/gatling || echo "GATLING FOLDER NOT FOUND"
 
